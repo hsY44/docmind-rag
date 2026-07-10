@@ -1,0 +1,10 @@
+# openai profile — demo quality chat (embeddings still Ollama; see PLANNING.md)
+spring:
+  ai:
+    model:
+      chat: openai
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      chat:
+        options:
+          model: gpt-4o-mini

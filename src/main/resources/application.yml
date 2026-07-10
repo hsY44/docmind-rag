@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: docmind-rag
+
+  profiles:
+    active: local
+
+  datasource:
+    url: jdbc:postgresql://localhost:5433/docmind_rag
+    username: docmind
+    password: docmind  # local dev only
+
+  ai:
+    model:
+      embedding: ollama  # fixed across profiles — single 768-dim vector space (see PLANNING.md)
+    ollama:
+      base-url: http://localhost:11434
+      embedding:
+        options:
+          model: nomic-embed-text
+    vectorstore:
+      pgvector:
+        initialize-schema: true
+        dimensions: 768  # nomic-embed-text
+        index-type: HNSW
+        distance-type: COSINE_DISTANCE
+    mcp:
+      client:
+        toolcallback:
+          enabled: true
+        streamable-http:
+          connections:
+            docmind:
+              url: http://localhost:8080
+
+server:
+  port: 8081

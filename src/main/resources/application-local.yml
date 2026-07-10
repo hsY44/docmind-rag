@@ -1,0 +1,9 @@
+# local profile — free, offline chat via Ollama
+spring:
+  ai:
+    model:
+      chat: ollama
+    ollama:
+      chat:
+        options:
+          model: qwen2.5:7b
