@@ -13,6 +13,12 @@ spring:
   ai:
     model:
       embedding: ollama  # fixed across profiles — single 768-dim vector space (see PLANNING.md)
+      # openai starter autoconfigures these regardless of chat profile; unused here, disable so boot doesn't need an API key
+      image: none
+      moderation: none
+      audio:
+        speech: none
+        transcription: none
     ollama:
       base-url: http://localhost:11434
       embedding:

@@ -6,22 +6,22 @@ Working task list. Claude: mark items `[x]` when done, add discovered tasks unde
 - [x] Create Spring Boot project (STS, Spring AI 1.1.8, Java 21)
 - [x] Convert `application.properties` → `application.yml` + profiles (local/openai)
 - [x] compose.yaml (pgvector:pg17, port 5433) + `.env.example`
-- [ ] `docker compose up` + `ollama pull nomic-embed-text qwen2.5:7b`
-- [ ] Verify boot under `local` profile WITHOUT `OPENAI_API_KEY` set
+- [x] `docker compose up` + `ollama pull nomic-embed-text qwen2.5:7b`
+- [x] Verify boot under `local` profile WITHOUT `OPENAI_API_KEY` set
       (if OpenAI autoconfig complains, disable unused openai models via `spring.ai.model.*` properties)
-- [ ] Verify pgvector schema auto-created (vector_store table, 768 dims)
-- [ ] Verify MCP client connects to docmind-mcp-server (:8080 must be running)
+- [x] Verify pgvector schema auto-created (vector_store table, 768 dims)
+- [x] Verify MCP client connects to docmind-mcp-server (:8080 must be running)
 
 ## Phase 1 — Ingestion Pipeline
-- [ ] MCP fetch: list/get documents from docmind-mcp-server via MCP client — follow specs in `docs/PLANNING.md`
-- [ ] Chunking with `TokenTextSplitter`, metadata (docId, title, tags) on each chunk
-- [ ] Store embeddings in pgvector; dedup by deleting existing chunks with same docId first
-- [ ] `POST /api/ingest` (single doc + all docs)
-- [ ] Verify: ingest seed docs → row count > 0, re-ingest → no duplicates
+- [x] MCP fetch: list/get documents from docmind-mcp-server via MCP client — follow specs in `docs/PLANNING.md`
+- [x] Chunking with `TokenTextSplitter`, metadata (docId, title, tags) on each chunk
+- [x] Store embeddings in pgvector; dedup by deleting existing chunks with same docId first
+- [x] `POST /api/ingest` (single doc + all docs)
+- [x] Verify: ingest seed docs → row count > 0, re-ingest → no duplicates
 
 ## Phase 2 — RAG Chat
-- [ ] ChatClient bean + `QuestionAnswerAdvisor` (topK 5)
-- [ ] `POST /api/chat` returning answer + deduplicated sources — follow specs in `docs/PLANNING.md`
+- [x] ChatClient bean + `QuestionAnswerAdvisor` (topK 5)
+- [x] `POST /api/chat` returning answer + deduplicated sources — follow specs in `docs/PLANNING.md`
 - [ ] Prompt template: answer in question's language, admit when context is missing
 - [ ] Verify: seeded question → grounded answer with correct sources; off-topic → no hallucination
 
