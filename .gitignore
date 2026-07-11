@@ -39,3 +39,6 @@ out/
 ### Local env / reviews ###
 .env
 .claude/reviews/
+
+### Local secrets ###
+application-local.yml
