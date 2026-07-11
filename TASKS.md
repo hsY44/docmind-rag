@@ -28,7 +28,7 @@ Working task list. Claude: mark items `[x]` when done, add discovered tasks unde
 ## Phase 3 — Agentic (MCP tools)
 - [x] Register docmind MCP tools on ChatClient (search/get only)
 - [x] System prompt: use tools when vector context is insufficient or exact keyword/id lookup is needed
-- [ ] Verify: exact-keyword query triggers an MCP tool call (check logs), answer uses tool result
+- [x] Verify: exact-keyword query triggers an MCP tool call (check logs), answer uses tool result
 
 ## Phase 4 — Polish
 - [ ] Error handling per API spec (structured JSON errors)

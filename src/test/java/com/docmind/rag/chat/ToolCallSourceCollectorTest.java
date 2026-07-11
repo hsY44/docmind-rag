@@ -63,6 +63,20 @@ class ToolCallSourceCollectorTest {
 	}
 
 	@Test
+	void parseSourcesFiltersOutNonIntegralNumericId() throws Exception {
+		// id가 6.7처럼 정수가 아닌 실수면 canConvertToLong()은 range만 보고 통과시켜 asLong()이 6으로
+		// 조용히 잘리므로(Jackson 확인됨), isIntegralNumber()로 정수 JSON 숫자인지 먼저 확인해야 한다
+		String innerJson = objectMapper.writeValueAsString(List.of(
+			Map.of("id", 6.7, "title", "잘못된 id"),
+			Map.of("id", 2, "title", "정상 문서")));
+		String rawToolResult = objectMapper.writeValueAsString(List.of(Map.of("type", "text", "text", innerJson)));
+
+		List<ChatService.Source> sources = ToolCallSourceCollector.parseSources(rawToolResult);
+
+		assertEquals(List.of(new ChatService.Source(2L, "정상 문서")), sources);
+	}
+
+	@Test
 	void parseSourcesReturnsEmptyForGarbageInput() {
 		assertEquals(List.of(), ToolCallSourceCollector.parseSources("not even json"));
 		assertEquals(List.of(), ToolCallSourceCollector.parseSources(""));

@@ -60,8 +60,10 @@ public final class ToolCallSourceCollector {
 		if (!n.hasNonNull("id") || !n.hasNonNull("title")) {
 			return false;
 		}
-		if (!n.get("id").canConvertToLong()) {
-			log.warn("tool 응답의 id가 숫자가 아님, 해당 항목 제외: {}", n.get("id"));
+		// canConvertToLong()은 6.7 같은 비정수 실수도 range 체크만 통과시켜 asLong()에서 조용히
+		// 6으로 잘리게 두므로(Jackson 확인됨), 정수 JSON 숫자인지 확인하는 isIntegralNumber()를 쓴다.
+		if (!n.get("id").isIntegralNumber()) {
+			log.warn("tool 응답의 id가 정수가 아님, 해당 항목 제외: {}", n.get("id"));
 			return false;
 		}
 		return true;

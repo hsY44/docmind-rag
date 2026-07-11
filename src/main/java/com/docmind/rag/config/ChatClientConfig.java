@@ -70,6 +70,9 @@ public class ChatClientConfig {
 	// tool 호출 결과에서 docId/title을 뽑아 ToolCallSourceCollector에 기록 — ChatService가
 	// 응답을 만들 때 이 기록을 sources에 합친다(벡터 검색으로 못 찾은 근거를 보완).
 	private static ToolCallback captureSources(ToolCallback delegate) {
+		// getToolDefinition()은 tool의 JSON 스키마를 매번 새로 만드는 무거운 호출이라(Spring AI MCP
+		// 콜백 확인됨) 로그에 쓸 이름은 호출마다 다시 구하지 않고 wrapping 시점에 한 번만 구해둔다.
+		String toolName = delegate.getToolDefinition().name();
 		return new ToolCallback() {
 			@Override
 			public ToolDefinition getToolDefinition() {
@@ -88,7 +91,7 @@ public class ChatClientConfig {
 
 			@Override
 			public String call(String toolInput, ToolContext toolContext) {
-				log.info("MCP tool called: {} input={}", delegate.getToolDefinition().name(), toolInput);
+				log.info("MCP tool called: {} input={}", toolName, toolInput);
 				String result = delegate.call(toolInput, toolContext);
 				ToolCallSourceCollector.record(ToolCallSourceCollector.parseSources(result));
 				return result;
