@@ -67,4 +67,27 @@ class ChatControllerTest {
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.error").exists());
 	}
+
+	@Test
+	void malformedJsonBodyReturns400WithFixedError() throws Exception {
+		mockMvc.perform(post("/api/chat").contentType(MediaType.APPLICATION_JSON).content("not json"))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.error").value("malformed request body"));
+	}
+
+	@Test
+	void unexpectedExceptionReturns500WithoutLeakingDetail() throws Exception {
+		when(chatService.ask(eq("질문"), isNull())).thenThrow(new RuntimeException("some internal detail"));
+
+		mockMvc.perform(post("/api/chat").contentType(MediaType.APPLICATION_JSON).content("{\"question\":\"질문\"}"))
+			.andExpect(status().isInternalServerError())
+			.andExpect(jsonPath("$.error").value("internal server error"));
+	}
+
+	@Test
+	void unsupportedContentTypeReturns415WithError() throws Exception {
+		mockMvc.perform(post("/api/chat").contentType(MediaType.TEXT_PLAIN).content("question=hi"))
+			.andExpect(status().isUnsupportedMediaType())
+			.andExpect(jsonPath("$.error").exists());
+	}
 }

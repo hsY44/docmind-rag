@@ -1,6 +1,7 @@
 package com.docmind.rag.api;
 
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -63,5 +64,22 @@ class IngestControllerTest {
 		mockMvc.perform(post("/api/ingest").contentType(MediaType.APPLICATION_JSON).content("{\"documentId\":99}"))
 			.andExpect(status().isBadGateway())
 			.andExpect(jsonPath("$.error").exists());
+	}
+
+	@Test
+	void illegalStateFromMcpClientReturns502WithoutLeakingRawUpstreamBody() throws Exception {
+		// 이 메시지는 MCP tool의 원본 응답 전체를 담고 있으므로(McpDocumentClient 확인됨) 클라이언트
+		// 응답에는 그 내용이 아니라 고정 메시지만 나가야 한다
+		when(ingestionService.ingestDocument(5L)).thenThrow(
+			new IllegalStateException("MCP tool 'getDocument' returned unparseable result: {\"secret\":\"내부 응답\"}"));
+
+		mockMvc.perform(post("/api/ingest").contentType(MediaType.APPLICATION_JSON).content("{\"documentId\":5}"))
+			.andExpect(status().isBadGateway())
+			.andExpect(jsonPath("$.error").value("MCP tool call failed"));
+	}
+
+	@Test
+	void wrongHttpMethodReturns405WithError() throws Exception {
+		mockMvc.perform(get("/api/ingest")).andExpect(status().isMethodNotAllowed()).andExpect(jsonPath("$.error").exists());
 	}
 }

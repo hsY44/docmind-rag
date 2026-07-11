@@ -31,7 +31,7 @@ Working task list. Claude: mark items `[x]` when done, add discovered tasks unde
 - [x] Verify: exact-keyword query triggers an MCP tool call (check logs), answer uses tool result
 
 ## Phase 4 — Polish
-- [ ] Error handling per API spec (structured JSON errors)
+- [x] Error handling per API spec (structured JSON errors)
 - [ ] Smoke test `openai` profile end-to-end (small budget)
 - [ ] Demo scenario script (seed via mcp-server → ingest → 3 questions incl. 1 agentic)
 - [ ] README.md in Korean (architecture diagram, hybrid model strategy, setup, demo screenshots)

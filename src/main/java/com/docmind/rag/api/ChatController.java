@@ -1,9 +1,5 @@
 package com.docmind.rag.api;
 
-import java.util.Map;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,11 +29,5 @@ public class ChatController {
 	}
 
 	public record ChatRequest(String question, Integer topK) {
-	}
-
-	// 이 엔드포인트에서 발생하는 예외만 최소 매핑 (전역 에러 처리는 Phase 4)
-	@ExceptionHandler(IllegalArgumentException.class)
-	ResponseEntity<Map<String, String>> onInvalidRequest(IllegalArgumentException e) {
-		return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
 	}
 }
