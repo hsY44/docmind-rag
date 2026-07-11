@@ -23,6 +23,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class McpDocumentClient {
 
+	// ChatClientConfig의 agenticToolFilter도 같은 tool 이름을 참조 — 하드코딩 중복(오타 drift) 방지
+	public static final String TOOL_GET_DOCUMENT = "getDocument";
+
 	// ponytail: 설정된 MCP 커넥션이 "docmind" 하나뿐이라 getFirst() 사용; 두 번째 서버가 생기면 이름으로 골라야 함
 	private final List<McpSyncClient> mcpSyncClients;
 	private final ObjectMapper objectMapper;
@@ -53,7 +56,7 @@ public class McpDocumentClient {
 		if (id == null) {
 			throw new IllegalArgumentException("id must not be null");
 		}
-		return callTool("getDocument", Map.of("id", id), DocumentDetail.class);
+		return callTool(TOOL_GET_DOCUMENT, Map.of("id", id), DocumentDetail.class);
 	}
 
 	private <T> T callTool(String toolName, Map<String, Object> arguments, Class<T> resultType) {
