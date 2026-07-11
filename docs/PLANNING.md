@@ -91,13 +91,14 @@ Errors: return structured JSON `{error: message}` with proper status; never leak
 | Agentic fallback | MCP tools (search/get) registered on ChatClient | LLM keyword-searches source docs when vector recall misses; the docmind integration story |
 | Document source | docmind-mcp-server via MCP client (no direct DB access) | keeps repo boundaries honest — rag never touches mcp-server's DB |
 | Secrets | `OPENAI_API_KEY` env var, `.env` gitignored | no keys in repo |
+| MCP client auth | sends `X-API-Key` header via `McpSyncHttpClientRequestCustomizer` (`config/McpAuthConfig`) | docmind-mcp-server protects `/mcp` with the same header — see that repo's PLANNING.md Key Decisions for the auth scheme rationale |
 
 ## Out of Scope (v1)
 - Reranking, hybrid (keyword+vector) search fusion → backlog
 - RAG evaluation (RAGAS etc.) → backlog, strong portfolio add
 - Streaming responses (SSE) → backlog
 - File upload/PDF parsing (Tika) — mcp-server stores text/markdown only
-- UI, auth, multi-tenant
+- UI, multi-tenant
 
 ## Verification
 - Phase gates: see TASKS.md — a phase is done only when its verify steps pass
