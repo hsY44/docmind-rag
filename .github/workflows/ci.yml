@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# 테스트 스위트는 외부 인프라(DB, MCP 서버, Ollama) 없이 도는 hermetic 구성 —
+# 전체 와이어링 검증은 로컬에서 bootRun + scripts/demo.sh로 수행 (docs/PLANNING.md Verification 참고)
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run tests
+        run: ./gradlew test

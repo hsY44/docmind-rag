@@ -33,8 +33,14 @@ Working task list. Claude: mark items `[x]` when done, add discovered tasks unde
 ## Phase 4 — Polish
 - [x] Error handling per API spec (structured JSON errors)
 - [ ] Smoke test `openai` profile end-to-end (small budget)
-- [ ] Demo scenario script (seed via mcp-server → ingest → 3 questions incl. 1 agentic)
-- [ ] README.md in Korean (architecture diagram, hybrid model strategy, setup, demo screenshots)
+- [x] Demo scenario script (seed via mcp-server → ingest → 3 questions incl. 1 agentic)
+- [x] README.md in Korean (architecture diagram, hybrid model strategy, setup, demo screenshots)
+
+## Phase 5 — Review follow-up (2026-07-12)
+- [x] Re-track `application-local.yml` (config, not secret — see PLANNING Key Decisions) + README setup step removed
+- [x] Hermetic test suite: drop `@SpringBootTest` contextLoads (needed live DB/MCP) — full wiring via demo.sh
+- [x] GitHub Actions CI (hermetic `./gradlew test`)
+- [x] Remove unused validation starter, add actuator (parity with mcp-server)
 
 ## Backlog (not now)
 - RAG evaluation (RAGAS or Spring AI evaluators)

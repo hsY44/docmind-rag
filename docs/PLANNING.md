@@ -12,7 +12,7 @@ with a hybrid local/paid model strategy and a custom MCP server as the document 
 ## Tech Stack
 - Java 21, Spring Boot 3.5.16, Gradle (Groovy)
 - Spring AI 1.1.8 — pgvector VectorStore, MCP client (Streamable HTTP), Ollama + OpenAI starters, QuestionAnswerAdvisor
-- PostgreSQL + pgvector (Docker, port 5433), Lombok, Validation
+- PostgreSQL + pgvector (Docker, port 5433), Lombok, Actuator (health check)
 - No JPA: vector store uses JdbcTemplate internally; use `JdbcClient` if metadata queries are needed
 
 ## Commands
@@ -91,6 +91,8 @@ Errors: return structured JSON `{error: message}` with proper status; never leak
 | Agentic fallback | MCP tools (search/get) registered on ChatClient | LLM keyword-searches source docs when vector recall misses; the docmind integration story |
 | Document source | docmind-mcp-server via MCP client (no direct DB access) | keeps repo boundaries honest — rag never touches mcp-server's DB |
 | Secrets | `OPENAI_API_KEY` env var, `.env` gitignored | no keys in repo |
+| Config vs secrets | `application-local.yml` IS tracked (contains only the Ollama model choice, no secrets); only `.env` is gitignored | fresh clone boots the local profile without manual file creation |
+| Test strategy | test suite is hermetic (pure unit + `@WebMvcTest` slices, no live DB/MCP/Ollama); no `@SpringBootTest` | `./gradlew test` and CI run anywhere; full wiring is verified via `bootRun` + `scripts/demo.sh` |
 | MCP client auth | sends `X-API-Key` header via `McpSyncHttpClientRequestCustomizer` (`config/McpAuthConfig`) | docmind-mcp-server protects `/mcp` with the same header — see that repo's PLANNING.md Key Decisions for the auth scheme rationale |
 
 ## Out of Scope (v1)
@@ -101,6 +103,9 @@ Errors: return structured JSON `{error: message}` with proper status; never leak
 - UI, multi-tenant
 
 ## Verification
+- Liveness: `curl http://localhost:8081/actuator/health`
+- Automated: hermetic test suite (`./gradlew test`, no external services) + GitHub Actions CI on push/PR
+- Full wiring (DB, MCP, Ollama): `bootRun` + `scripts/demo.sh`
 - Phase gates: see TASKS.md — a phase is done only when its verify steps pass
 - Ingestion: after `POST /api/ingest`, chunk rows exist in pgvector with correct metadata; re-ingest does not duplicate
 - Chat: seeded question returns grounded answer citing correct source docs; off-topic question does not hallucinate

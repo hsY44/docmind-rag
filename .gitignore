@@ -40,5 +40,3 @@ out/
 .env
 .claude/reviews/
 
-### Local secrets ###
-application-local.yml
