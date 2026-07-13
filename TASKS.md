@@ -42,6 +42,12 @@ Working task list. Claude: mark items `[x]` when done, add discovered tasks unde
 - [x] GitHub Actions CI (hermetic `./gradlew test`)
 - [x] Remove unused validation starter, add actuator (parity with mcp-server)
 
+## Phase 6 — Documents REST API (docmind-web 선행작업)
+- [x] `GET /api/documents`, `GET /api/documents/{id}`, `POST /api/documents` — follow specs in `docs/PLANNING.md` (Documents REST API section)
+- [x] `McpDocumentClient.saveDocument()` 추가 (MCP saveDocument tool 호출)
+- [x] Controller tests (@WebMvcTest, hermetic 유지)
+- [x] Verify: curl로 3개 엔드포인트 + 에러 케이스(404/400) 확인
+
 ## Backlog (not now)
 - RAG evaluation (RAGAS or Spring AI evaluators)
 - Hybrid search (keyword + vector fusion), reranking

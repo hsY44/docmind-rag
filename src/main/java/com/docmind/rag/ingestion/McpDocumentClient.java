@@ -16,8 +16,8 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 
 /**
- * docmind-mcp-server의 listDocuments/getDocument MCP tool을 ChatClient 없이 직접 호출하는 fetch 클라이언트.
- * ingestion 파이프라인 전용 — LLM을 거치지 않는 결정적(deterministic) 호출.
+ * docmind-mcp-server의 listDocuments/getDocument/saveDocument MCP tool을 ChatClient 없이 직접 호출하는 클라이언트.
+ * ingestion 파이프라인과 Documents REST API(DocumentController)가 사용 — LLM을 거치지 않는 결정적(deterministic) 호출.
  */
 @Component
 @RequiredArgsConstructor
@@ -59,6 +59,16 @@ public class McpDocumentClient {
 		return callTool(TOOL_GET_DOCUMENT, Map.of("id", id), DocumentDetail.class);
 	}
 
+	public SavedDocument saveDocument(String title, String content, String tags) {
+		Map<String, Object> arguments = new HashMap<>();
+		arguments.put("title", title);
+		arguments.put("content", content);
+		if (tags != null) {
+			arguments.put("tags", tags);
+		}
+		return callTool("saveDocument", arguments, SavedDocument.class);
+	}
+
 	private <T> T callTool(String toolName, Map<String, Object> arguments, Class<T> resultType) {
 		McpSchema.CallToolResult result = mcpSyncClients.getFirst()
 				.callTool(new McpSchema.CallToolRequest(toolName, arguments));
@@ -92,6 +102,10 @@ public class McpDocumentClient {
 
 	@JsonIgnoreProperties(ignoreUnknown = true)
 	public record DocumentPage(List<DocumentSummary> documents, long total) {
+	}
+
+	@JsonIgnoreProperties(ignoreUnknown = true)
+	public record SavedDocument(Long id, String title) {
 	}
 
 	/**

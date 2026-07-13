@@ -17,6 +17,7 @@ import org.mockito.ArgumentCaptor;
 import com.docmind.rag.ingestion.McpDocumentClient.DocumentDetail;
 import com.docmind.rag.ingestion.McpDocumentClient.DocumentPage;
 import com.docmind.rag.ingestion.McpDocumentClient.McpToolMessageException;
+import com.docmind.rag.ingestion.McpDocumentClient.SavedDocument;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.modelcontextprotocol.client.McpSyncClient;
@@ -54,6 +55,36 @@ class McpDocumentClientTest {
 		verify(client).callTool(captor.capture());
 		assertEquals("getDocument", captor.getValue().name());
 		assertEquals(Map.of("id", 3L), captor.getValue().arguments());
+	}
+
+	@Test
+	void saveDocumentSendsArgumentsAndParsesSavedDocument() {
+		McpSyncClient client = mock(McpSyncClient.class);
+		String json = "{\"id\":7,\"title\":\"t\"}";
+		when(client.callTool(any())).thenReturn(new CallToolResult(List.of(new TextContent(json)), false, null, null));
+		McpDocumentClient documentClient = new McpDocumentClient(List.of(client), new ObjectMapper());
+
+		SavedDocument saved = documentClient.saveDocument("t", "c", "a,b");
+
+		assertEquals(7L, saved.id());
+		ArgumentCaptor<CallToolRequest> captor = ArgumentCaptor.forClass(CallToolRequest.class);
+		verify(client).callTool(captor.capture());
+		assertEquals("saveDocument", captor.getValue().name());
+		assertEquals(Map.of("title", "t", "content", "c", "tags", "a,b"), captor.getValue().arguments());
+	}
+
+	@Test
+	void saveDocumentOmitsNullTagsArgument() {
+		McpSyncClient client = mock(McpSyncClient.class);
+		when(client.callTool(any()))
+			.thenReturn(new CallToolResult(List.of(new TextContent("{\"id\":8,\"title\":\"t\"}")), false, null, null));
+		McpDocumentClient documentClient = new McpDocumentClient(List.of(client), new ObjectMapper());
+
+		documentClient.saveDocument("t", "c", null);
+
+		ArgumentCaptor<CallToolRequest> captor = ArgumentCaptor.forClass(CallToolRequest.class);
+		verify(client).callTool(captor.capture());
+		assertEquals(Map.of("title", "t", "content", "c"), captor.getValue().arguments());
 	}
 
 	@Test

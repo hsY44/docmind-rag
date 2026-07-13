@@ -45,7 +45,7 @@ public class ChatClientConfig {
 	private static final Set<String> AGENTIC_MCP_TOOLS = Set.of("searchDocuments", McpDocumentClient.TOOL_GET_DOCUMENT);
 
 	// Spring AI의 SyncMcpToolCallbackProvider 자동설정이 이 Bean을 주입받아 노출 tool을 필터링함
-	// (listDocuments/saveDocument는 ingestion 전용, 에이전트에는 노출하지 않음)
+	// (listDocuments/saveDocument는 ingestion·REST 경로 전용, 에이전트에는 노출하지 않음)
 	@Bean
 	McpToolFilter agenticToolFilter() {
 		return (connectionInfo, tool) -> AGENTIC_MCP_TOOLS.contains(tool.name());

@@ -9,7 +9,9 @@ import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import com.docmind.rag.api.DocumentController.DocumentNotFoundException;
 import com.docmind.rag.ingestion.IngestionService.EmptyDocumentException;
 import com.docmind.rag.ingestion.McpDocumentClient.McpToolMessageException;
 
@@ -26,6 +28,11 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(EmptyDocumentException.class)
 	ResponseEntity<Map<String, String>> onEmptyDocument(EmptyDocumentException e) {
 		return ResponseEntity.unprocessableEntity().body(Map.of("error", e.getMessage()));
+	}
+
+	@ExceptionHandler(DocumentNotFoundException.class)
+	ResponseEntity<Map<String, String>> onDocumentNotFound(DocumentNotFoundException e) {
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
 	}
 
 	// MCP tool이 JSON이 아닌 상태 메시지를 반환(문서 없음, 서버 에러 등) → upstream 게이트웨이 에러로 처리
@@ -47,6 +54,14 @@ public class GlobalExceptionHandler {
 	ResponseEntity<Map<String, String>> onIllegalState(IllegalStateException e) {
 		log.warn("MCP client failure: {}", e.getMessage());
 		return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(Map.of("error", "MCP tool call failed"));
+	}
+
+	// path variable/query param 타입 변환 실패(예: /api/documents/abc) — 클라이언트 입력 오류인데
+	// catch-all이 잡으면 500이 되므로 400으로 명시 처리. 원본 메시지는 내부 타입명을 담고 있어
+	// 파라미터명만 노출한다.
+	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
+	ResponseEntity<Map<String, String>> onTypeMismatch(MethodArgumentTypeMismatchException e) {
+		return ResponseEntity.badRequest().body(Map.of("error", "invalid parameter: " + e.getName()));
 	}
 
 	// 지원하지 않는 HTTP 메서드/Content-Type — 아래 catch-all(Exception.class)이 이 두 타입도 잡아

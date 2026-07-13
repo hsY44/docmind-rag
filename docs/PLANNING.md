@@ -79,6 +79,18 @@ Errors: return structured JSON `{error: message}` with proper status; never leak
 - Answer language: match the question language (Korean question → Korean answer)
 - No relevant context found → answer honestly that the knowledge base has no info; do NOT hallucinate
 
+### Documents REST API (for docmind-web)
+Thin REST layer over the existing `McpDocumentClient` so the frontend can browse/create
+documents without touching MCP directly. No new business logic — delegate to MCP tools.
+- `GET /api/documents?tag=&page=&size=` → `{documents: [{id, title, tags}], total}`
+  (maps to `listDocuments`; page default 0, size default 20 max 50)
+- `GET /api/documents/{id}` → `{id, title, content, tags}` (maps to `getDocument`;
+  not-found → 502 with `{error}` per existing MCP error mapping, or 404 if distinguishable
+  from `McpToolMessageException` message — prefer 404 for "No document found")
+- `POST /api/documents` `{title, content, tags?}` → 201 Created `{id, title}` (requires a new
+  `saveDocument` call in `McpDocumentClient`; validate title ≤ 200, content non-blank → 400)
+- Error shape follows the global `{error: message}` convention
+
 ## Key Decisions
 | Decision | Choice | Why |
 |----------|--------|-----|
