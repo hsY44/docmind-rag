@@ -109,6 +109,8 @@ SPRING_PROFILES_ACTIVE=openai OPENAI_API_KEY=... ./gradlew bootRun
 ./scripts/demo.sh
 ```
 
+![데모 실행](docs/images/demo-run.png)
+
 **1~2단계 — 시드 + 인제스트**
 ```
 == 1. docmind-mcp-server 시드 데이터 적재 ==
@@ -121,6 +123,14 @@ INSERT 0 5
   "chunks": 5
 }
 ```
+
+인제스트 후 pgvector에 청크가 실제로 저장된 것을 확인할 수 있다:
+```bash
+docker compose exec postgres psql -U docmind -d docmind_rag \
+  -c "SELECT metadata->>'docId' AS doc_id, metadata->>'title' AS title FROM vector_store;"
+```
+
+![pgvector에 저장된 청크](docs/images/vector-store-chunks.png)
 
 **질문 1, 2 — 벡터 검색 (`QuestionAnswerAdvisor`)**
 
@@ -164,8 +174,9 @@ Q: Spring Boot의 장점이 뭐야?
 **질문 3 — 에이전틱 (MCP tool 호출)**
 
 정확한 문서 id를 지정하면 벡터 검색 대신 `getDocument` MCP tool을 직접 호출해 원문을
-가져온다. 서버 로그에서 실제 호출을 확인할 수 있다: `MCP tool called: getDocument
-input={"id":2}`.
+가져온다. 서버 로그에서 실제 호출을 확인할 수 있다:
+
+![MCP tool 호출 로그](docs/images/agentic-tool-log.png)
 ```
 == 5. 질문 3 (에이전틱 — 정확한 id 지정, MCP tool 호출 유도) ==
 Q: 문서 id 2번을 정확히 검색해서 원문 내용을 알려줘

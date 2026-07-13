@@ -40,3 +40,6 @@ out/
 .env
 .claude/reviews/
 
+### macOS ###
+.DS_Store
+
